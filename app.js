@@ -6,6 +6,8 @@ import logger from 'morgan'
 import indexRouter from './routes/index.js'
 import usersRouter from './routes/users.js'
 import authenRouter from './routes/authen.js'
+import http from 'http'
+import Debug from "debug";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
@@ -42,10 +44,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-import Debug from "debug";
-const debug = Debug("libaries-exaple:server");
-import http from 'http'
 
+const debug = Debug("libaries-exaple:server");
 /**
  * Get port from environment and store in Express.
  */
@@ -126,5 +126,4 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
-
 export default app;
