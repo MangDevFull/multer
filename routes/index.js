@@ -1,36 +1,30 @@
 import express from 'express'
-import Queue from "bull"
+import multer from 'multer';
 var router = express.Router();
-/* GET home page. */
-router.get('/queue', function (req, res, next) {
-  // in 1 second run 1 job
-  const queue = new Queue('my-first-queue',{ limiter: {
-    max: 1,
-    duration: 1000,
-  },});
-  const main = async () => {
-     queue.add({ name: "John", age: 30 });
-     queue.add({ name: "John", age: 31 });
-     queue.add({ name: "John", age: 32 });
-     queue.add({ name: "John", age: 33 });
-     queue.add({ name: "John", age: 34 });
-     queue.add({ name: "John", age: 35 });
-     queue.add({ name: "John", age: 36 });
-     queue.add({ name: "John", age: 37 });
-     queue.add({ name: "John", age: 38 });
-     queue.add({ name: "John", age: 39 });
-     queue.add({ name: "John", age: 40 });
-     queue.add({ name: "John", age: 41 });
-  };
-
-  queue.process((job, done) => {
-    console.log("test")
-    console.log(job.data);
-    done();
-  });
-
-  main().catch(console.error);
-  return res.json({oke:true})
-});
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    //files khi upload xong sẽ nằm trong thư mục "uploads" này - các bạn có thể tự định nghĩa thư mục này
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    // tạo tên file = thời gian hiện tại nối với số ngẫu nhiên => tên file chắc chắn không bị trùng
+    const filename = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, filename + '-' + file.originalname)
+  }
+})
+const upload = multer({ storage: storage })
+router.post('/single', upload.array('file'), (req, res, next) => {
+  //nhận dữ liệu từ form
+  const file = req.files;
+  // Kiểm tra nếu không phải dạng file thì báo lỗi
+  if (!file) {
+    const error = new Error('Upload file again!')
+    error.httpStatusCode = 400
+    return next(error)
+  }
+  // file đã được lưu vào thư mục uploads
+  // gọi tên file: req.file.filename và render ra màn hình
+  res.send("oke")
+})
 
 export default router;
